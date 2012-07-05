@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html lang="es">
+	<head>
+		<meta charset=utf-8>
+		<title>TimepickerInputMask by Neobytec http://www.neobytec.com</title>
+		<script language="javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+		<script language="javascript" src="jquery.mousewheel.js"></script>
+		<script language="javascript" src="jquery.timepickerinputmask.min.js"></script>
+		<script>
+			$(document).ready(function () {
+
+				$('.input1').TimepickerInputMask();
+
+				$('.input2').TimepickerInputMask({
+					spinners: true
+				});
+
+				$('.input3').TimepickerInputMask();
+
+				$('.input4').TimepickerInputMask({
+					separator: '.'
+				});
+
+				$('.input5').TimepickerInputMask({
+					spinners:	true,
+					bgcolor: 	'#990000',
+					arrowColor:	'#fff'
+				});
+				
+			});
+		</script>
+	</head>
+	<body>
+		<form>
+			<p>Timepicker with defaults values. Use tab key to change focus on hours, minutes and seconds and write a correct hour in 24H format or use the mouse wheel.</p>
+			<input class="input1" type="text" name="input1" />
+			<p>Timepicker with spinner mode. You can use the spinners to increase or decrease the time, write the time or use the mouse wheel to change it.</p>
+			<input class="input2" type="text" name="input1" />
+			<p>Timepicker with default value and default separator.</p>
+			<input class="input3" type="text" name="input1" value="12:28:19" />
+			<p>Timepicker with default value and separator '.'.</p>
+			<input class="input4" type="text" name="input1" value="12.28.19" />
+			<p>Timepicker diferent spinners colors.</p>
+			<input class="input5" type="text" name="input1" />
+		</form>
+	</body>
+</html>
