@@ -22,7 +22,6 @@ You can find the following demos in jsfiddle.
 * Loading a default value from the input.
 * Change the spinners colors.
 * Using a diferent separator.
-* Using styles with the plugin.
 
 ## Options
 
@@ -43,9 +42,7 @@ This plugin depens of jQuery 1.7.1, of course, and from jQuery Mouse Wheel Plugi
 
 This plugin has been tested in:
 
-* Internet Explorer 7+
-* Firefox 3+
-* Chrome 8+
+* I'm testing now...
 
 ## License
 
