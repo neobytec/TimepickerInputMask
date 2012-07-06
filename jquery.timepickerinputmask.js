@@ -245,8 +245,8 @@
 					minutesPos		= hoursPos + methods.getTextWidth(spinnerSeparator + partsValue[1]),
 					secondsPos		= minutesPos + methods.getTextWidth(spinnerSeparator + partsValue[2]),
 					separatorSize	= methods.getTextWidth(spinnerSeparator),
-					borderTop		= parseInt($element.css('border-top-width').replace('px', '')),
-					borderLeft		= parseInt($element.css('border-left-width').replace('px', ''));
+					borderTop		= parseInt($element.css('border-top-width').replace('px', ''), 10),
+					borderLeft		= parseInt($element.css('border-left-width').replace('px', ''), 10);
 
 				//Arrow positions and size.
 				var	topUp			= (2 * height) / 21,
