@@ -11,7 +11,10 @@
 (function($) {
     $.fn.TimepickerInputMask = function(options) {
  
-        var $element = null;
+    	//Html elements, first the original after the spinner element and the last is the current element.
+        var $element		= null,
+        	$spinnerElement = null,
+        	$currentElement = null;
 
       	//Default options.
         var options = $.extend({
@@ -28,26 +31,34 @@
         	minutes = 0,
         	seconds	= 0;
 
-        //Control position vars.
-        var counter	= 2,
-        	currentPosition = 0,
-        	lastPosition = ((options.seconds) ? 2 : 1),
-        	isActive = false;
+        //Control position vars, flag of focus and spinnerSeparator.
+        var counter				= 2,
+        	currentPosition 	= 0,
+        	lastPosition 		= ((options.seconds) ? 2 : 1),
+        	isActive 			= false,
+        	spinnerSeparator	= options.separator;
  
 		//Methods var with the events and common methods.
 		var methods = {
 			init:   function () {
+				$currentElement = $element;
+				//Using spinners if the option is set.
+				if (options.spinners) {
+					methods.initSpinners();
+					$currentElement = $spinnerElement;
+				}
+				
 				//Events.
-				$element.bind('focus', methods.events.focus);
-				$element.bind('blur', methods.events.blur);
-				$element.bind('click', methods.events.focus);
-				$element.bind('keydown', methods.events.keyDown);
-				$element.bind('keyup', methods.events.keyUp);
+				$currentElement.bind('focus', methods.events.focus);
+				$currentElement.bind('blur', methods.events.blur);
+				$currentElement.bind('click', methods.events.focus);
+				$currentElement.bind('keydown', methods.events.keyDown);
+				$currentElement.bind('keyup', methods.events.keyUp);
 				$(document).bind('mousewheel', methods.events.mousewheel);
-
+	
 				//Disabling drag and drop in the input.
-				$element.bind('drag drop', function () {return false;});
-
+				$currentElement.bind('drag drop', function () {return false;});
+	
 				//Check if the value is valid including the specified separator.
 				if (methods.checkHour($element.val())) {
 					methods.parseValue($element.val());
@@ -63,11 +74,6 @@
 						seconds		= date.getSeconds();
 					}
 				}
-
-				//Using spinners if the option is set.
-				if (options.spinners) {
-					methods.initSpinners();
-				}
 				
 				methods.showValue();
 			},
@@ -81,7 +87,7 @@
 					if (!methods.checkHour($element.val())) {
 						methods.showValue();
 					}
-					
+
 					methods.setPosition(currentPosition);
 				},
 				blur:		function (event) {
@@ -161,41 +167,46 @@
 					seconds = (hourParts[2] != undefined) ? parseInt(hourParts[2], 10) : seconds;
 				}
 			},
-			//Show the time in format hh[separator]mm[separator]ss
-			showValue:	function (asText) {
-				var finalValue = '';
-
-				finalValue += ((hours < 10)		? '0' + hours	: hours) + options.separator;
-				finalValue += ((minutes < 10)	? '0' + minutes	: minutes);
-
+			//Show the time in format hh[separator]mm[separator]ss always show in both input if we used spinners.
+			showValue:	function (asText, showSpinner) {
+				
+				var time = [
+				            ((hours < 10) ? '0' + hours	: hours),
+				            ((minutes < 10)	? '0' + minutes	: minutes)
+				];
+				
 				if (options.seconds) {
-					finalValue += options.separator + ((seconds < 10) ? '0' + seconds : seconds);		
-				}
-
-				if (asText) {
-					return finalValue;
+					time[2] = ((seconds < 10) ? '0' + seconds : seconds);
 				}
 				
-				$element.val(finalValue);
+				if (options.spinners) {
+					$spinnerElement.val(time.join(spinnerSeparator));
+				}
+				
+				if (asText) {
+					return (showSpinner) ? time.join(spinnerSeparator) : time.join(options.separator);
+				}
+				
+				$element.val(time.join(options.separator));
 			},
 			//Selecting a text range.
 			selectText:	function (start, end) {
-				if	($element.get(0).createTextRange) {
-		            var selRange = $element.get(0).createTextRange();
+				if	($currentElement.get(0).createTextRange) {
+		            var selRange = $currentElement.get(0).createTextRange();
 		            selRange.collapse(true);
 		            selRange.moveStart('character', start);
 		            selRange.moveEnd('character', end);
 		            selRange.select();
-		        } else if ($element.get(0).setSelectionRange) {
-		        	$element.get(0).setSelectionRange(start, end);
-		        } else if ($element.get(0).selectionStart) {
-		        	$element.get(0).selectionStart	= start;
-		        	$element.get(0).selectionEnd	= end;
+		        } else if ($currentElement.get(0).setSelectionRange) {
+		        	$currentElement.get(0).setSelectionRange(start, end);
+		        } else if ($currentElement.get(0).selectionStart) {
+		        	$currentElement.get(0).selectionStart	= start;
+		        	$currentElement.get(0).selectionEnd		= end;
 		        }
 			},
 			//Select the current position.
 			setPosition:	function (position) {
-				var step			= options.separator.length,
+				var step			= (options.spinners) ? spinnerSeparator.length : options.separator.length,
 					positionMinutes	= (2 + step),
 					positionSeconds = positionMinutes + (2 + step);
 				
@@ -217,7 +228,10 @@
 			},				
 			initSpinners:	function () {
 				//Increasing the distance between the hours part for include the spinner.
-				options.separator = options.separator + options.separator + options.separator + options.separator; 
+				spinnerSeparator = options.separator + options.separator + options.separator + options.separator;
+				
+				//Duplicating the input and hide the original.
+				$spinnerElement = $element.clone().attr('name', 'spinnerElement'); 
 				
 				//Current input position and size.
 				var position		= $element.position(),
@@ -225,12 +239,12 @@
 					width			= $element.width();
 				
 				//Obtaining the text width to positioning the spinners.
-				var valueToPrint	= methods.showValue(true),
-					partsValue	 	= valueToPrint.split(options.separator),
+				var valueToPrint	= methods.showValue(true, true),
+					partsValue	 	= valueToPrint.split(spinnerSeparator),
 					hoursPos		= methods.getTextWidth(partsValue[0]),
-					minutesPos		= hoursPos + methods.getTextWidth(options.separator + partsValue[1]),
-					secondsPos		= minutesPos + methods.getTextWidth(options.separator + partsValue[2]),
-					separatorSize	= methods.getTextWidth(options.separator),
+					minutesPos		= hoursPos + methods.getTextWidth(spinnerSeparator + partsValue[1]),
+					secondsPos		= minutesPos + methods.getTextWidth(spinnerSeparator + partsValue[2]),
+					separatorSize	= methods.getTextWidth(spinnerSeparator),
 					borderTop		= parseInt($element.css('border-top-width').replace('px', '')),
 					borderLeft		= parseInt($element.css('border-left-width').replace('px', ''));
 
@@ -242,24 +256,36 @@
 				
 				//Templates to append with the options specified.
 				var spinners		= '<div class="TimepickerInputMask.spinners" style="position: absolute; background: transparent;"></div>',
+					spinnersContent = '<div class="spinners.container" style="position: absolute; background: transparent;"></div>',
 					arrowsContainer	= '<div style="position: absolute;background: ' + options.bgcolor + ';height: 100%;width: ' +
 						separatorSize + 'px;top: 0;"></span>',
 					upSpinner		= '<a href="javascript:;" class="up" style="position: absolute;width: 0;height: 0;border-left: ' + 
 						arrowSize + 'px solid transparent;border-right: ' + arrowSize + 'px solid transparent;border-bottom: ' + 
-						arrowSize + 'px solid ' + options.arrowColor + ';"></a>',
+						arrowSize + 'px solid ' + options.arrowColor + ';" tabindex="9999"></a>',
 					downSpinner 	= '<a href="javascript:;" class="down" style="position: absolute;width: 0;height: 0;border-left: ' +
 						arrowSize + 'px solid transparent;border-right: ' + arrowSize + 'px solid transparent;border-top: ' + 
-						arrowSize + 'px solid ' + options.arrowColor + ';"></a>';
-
+						arrowSize + 'px solid ' + options.arrowColor + ';" tabindex="9999"></a>';
+				
 				//Main container of the spinner layer.
-				var $spinnersContainer = $(spinners).appendTo($element.parent()).css({
-					top:	position.top + borderTop,
-					left:	position.left + borderLeft,
-					height:	height + 2
+				var $spinners = $(spinners).insertAfter($element).css({
+					top:	position.top,
+					left:	position.left,
+					height:	height
 				});
-
+				
+				//Change the index tab for the original input to prevent the access. 
+				$element.attr('tabindex', '9999');
+				$spinners.append($spinnerElement);
+				
+				//Container for the spinners blocks. We put at the beginning for the behaviour of the tab key.
+				var $spinnersContent = $(spinnersContent).appendTo($spinners).css({
+					top:	borderTop,
+					left:	borderLeft,
+					height:	height + 2,
+				});
+				
 				//Hours spinner container.
-				var $hoursContainer = $(arrowsContainer).appendTo($spinnersContainer).css({
+				var $hoursContainer = $(arrowsContainer).appendTo($spinnersContent).css({
 					left:	hoursPos
 				}).addClass('hours');					
 
@@ -274,7 +300,7 @@
 				}).bind('click', methods.events.clickSpinner);
 
 				//Minutes spinner container.
-				var $minutesContainer = $(arrowsContainer).appendTo($spinnersContainer).css({
+				var $minutesContainer = $(arrowsContainer).appendTo($spinnersContent).css({
 					left:	minutesPos
 				}).addClass('minutes');						
 
@@ -290,7 +316,7 @@
 
 				//Seconds spinner container if options.seconds is true.	
 				if (options.seconds) {
-					var $secondsContainer = $(arrowsContainer).appendTo($spinnersContainer).css({
+					var $secondsContainer = $(arrowsContainer).appendTo($spinnersContent).css({
 						left:	secondsPos
 					}).addClass('seconds');
 
