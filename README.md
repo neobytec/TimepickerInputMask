@@ -15,14 +15,13 @@ The plugin has two properties for changing spinners colors, if you use this mode
 
 ## Demos
 
-You can find the following demos in jsfiddle.
+You can find the following demos in samples.html.
 
 * Input mask mode.
 * Spinner mode.
 * Loading a default value from the input.
 * Change the spinners colors.
-* Using a diferent separator.
-* Using styles with the plugin.
+* Using a distinct separator.
 
 ## Options
 
@@ -37,15 +36,13 @@ The plugin has the following list of options:
 
 ## Dependences
 
-This plugin depens of jQuery 1.7.1, of course, and from jQuery Mouse Wheel Plugin which is located in https://github.com/brandonaaron/jquery-mousewheel and has a MIT license like this plugin.
+This plugin depends of jQuery 1.7.1, of course, and from jQuery Mouse Wheel Plugin which is located in https://github.com/brandonaaron/jquery-mousewheel and has a MIT license like this plugin.
 
 ## Browsers
 
 This plugin has been tested in:
 
-* Internet Explorer 7+
-* Firefox 3+
-* Chrome 8+
+* I'm testing now...
 
 ## License
 
