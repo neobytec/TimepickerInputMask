@@ -281,7 +281,7 @@
 				var $spinnersContent = $(spinnersContent).appendTo($spinners).css({
 					top:	borderTop,
 					left:	borderLeft,
-					height:	height + 2,
+					height:	height,
 				});
 				
 				//Hours spinner container.
