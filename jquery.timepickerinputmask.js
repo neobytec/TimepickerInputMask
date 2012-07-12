@@ -130,6 +130,7 @@
 				mousewheel:	function (event, delta) {
 
 					if (isActive) {
+						event.preventDefault();
 						var op = (delta == 1) ? 'up' : 'down';
 
 						methods.changeValue(op);
